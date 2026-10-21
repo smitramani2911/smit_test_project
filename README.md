@@ -1,0 +1,1 @@
+# smit_test_project
