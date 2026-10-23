@@ -1,0 +1,138 @@
+{% doc %}
+  Renders product information rows (ingredients, how to use, details) from product metafields.
+  A row appears only when its heading is set and the product has a value for its metafield,
+  so products without that information show nothing.
+
+  Metafields read (namespace.key): custom.ingredients, custom.how_to_use, custom.details.
+  Rich text, multi-line text and single-line text metafield types are supported.
+
+  @example
+  {% content_for 'block', type: 'product-info-accordion', id: 'product-info' %}
+{% enddoc %}
+
+{% liquid
+  assign block_settings = block.settings
+  assign product = closest.product
+  assign metafield_keys = 'ingredients,how_to_use,details' | split: ','
+%}
+
+{% capture rows %}
+  {% for key in metafield_keys %}
+    {% liquid
+      assign heading_setting = 'heading_' | append: forloop.index
+      assign heading = block_settings[heading_setting]
+      assign value = product.metafields.custom[key]
+    %}
+    {% if heading != blank and value != blank %}
+      {% capture row %}
+        <details class="details">
+          <summary class="details__header">
+            {{ heading | escape }}
+            <span class="svg-wrapper icon-caret icon-animated">
+              {{- 'icon-caret.svg' | inline_asset_content -}}
+            </span>
+            <span class="svg-wrapper icon-plus">
+              {{- 'icon-plus.svg' | inline_asset_content -}}
+            </span>
+          </summary>
+          <div class="details-content rte">
+            {{ value | metafield_tag }}
+          </div>
+        </details>
+      {% endcapture %}
+      {% liquid
+        assign open_row = false
+        if forloop.first and block_settings.open_first
+          assign open_row = true
+        endif
+        render 'accordion-custom-component', children: row, open_by_default_on_desktop: open_row, open_by_default_on_mobile: open_row
+      %}
+    {% endif %}
+  {% endfor %}
+{% endcapture %}
+
+{% if rows != blank %}
+  <div
+    class="accordion accordion--caret product-info-accordion{% if block_settings.dividers %} accordion--dividers{% endif %}"
+    style="
+      --summary-font-family: var(--font-h5--family);
+      --summary-font-style: var(--font-h5--style);
+      --summary-font-weight: var(--font-h5--weight);
+      --summary-font-size: var(--font-h5--size);
+      --summary-font-line-height: var(--font-h5--line-height);
+      --summary-font-case: var(--font-h5--case);
+    "
+    {{ block.shopify_attributes }}
+  >
+    {{ rows }}
+  </div>
+
+  {% render 'accordion-styles' %}
+{% endif %}
+
+{% stylesheet %}
+  .product-info-accordion {
+    width: 100%;
+  }
+
+  .product-info-accordion .details-content {
+    padding-block-end: var(--padding-md);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:names.product_information",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:names.row"
+    },
+    {
+      "type": "text",
+      "id": "heading_1",
+      "label": "t:settings.heading"
+    },
+    {
+      "type": "header",
+      "content": "t:names.row"
+    },
+    {
+      "type": "text",
+      "id": "heading_2",
+      "label": "t:settings.heading"
+    },
+    {
+      "type": "header",
+      "content": "t:names.row"
+    },
+    {
+      "type": "text",
+      "id": "heading_3",
+      "label": "t:settings.heading"
+    },
+    {
+      "type": "header",
+      "content": "t:content.appearance"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_first",
+      "label": "t:settings.open_by_default",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "dividers",
+      "label": "t:settings.dividers",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.product_information"
+    }
+  ]
+}
+{% endschema %}

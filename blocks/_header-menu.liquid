@@ -94,6 +94,18 @@
 
     {% capture children %}
       {% for link in block_settings.menu.links %}
+        {%- liquid
+          # Match an optional mega menu item (blocks/_mega-item.liquid) to this link by title, ignoring case.
+          assign mega = null
+          assign link_key = link.title | downcase | strip
+          for candidate in block.blocks
+            assign candidate_key = candidate.settings.menu_item_title | downcase | strip
+            if candidate_key == link_key
+              assign mega = candidate
+              break
+            endif
+          endfor
+        -%}
         <li
           class="menu-list__list-item"
           on:blur="/deactivate"
@@ -112,7 +124,12 @@
             {% endif %}
             ref="menuitem"
           >
-            <span class="menu-list__link-title">{{- link.title -}}</span>
+            <span class="menu-list__link-title">
+              {%- if mega and mega.settings.badge_text != blank -%}
+                <span class="menu-list__badge">{{ mega.settings.badge_text | escape }}</span>
+              {%- endif -%}
+              {{- link.title -}}
+            </span>
           </a>
           {%- if link.links != blank -%}
             <button
@@ -148,9 +165,96 @@
                 {% assign list_id = 'MegaMenuList-' | append: forloop.index %}
                 <div class="mega-menu section section--full-width-margin section--{{ section.settings.section_width }}">
                   <div
-                    class="mega-menu__grid"
+                    class="mega-menu__grid{% if mega %} mega-menu__grid--tiles{% endif %}"
                     data-menu-grid-id="{{ list_id }}"
                   >
+                    {% if mega %}
+                      <div class="mega-menu__aside">
+                        {%- if mega.settings.panel_heading != blank -%}
+                          <p class="mega-menu__heading">{{ mega.settings.panel_heading | escape }}</p>
+                        {%- endif -%}
+                        <ul class="mega-menu__aside-list list-unstyled">
+                          {%- for childlink in link.links -%}
+                            <li>
+                              <a
+                                href="{{ childlink.url }}"
+                                class="mega-menu__link{% if childlink.links != blank %} mega-menu__link--parent{% endif %}"
+                                {% if childlink.current %}
+                                  aria-current="page"
+                                {% endif %}
+                              >
+                                <span class="wrap-text">{{- childlink.title -}}</span>
+                              </a>
+                              {%- if childlink.links != blank -%}
+                                <ul class="list-unstyled">
+                                  {%- for grandchildlink in childlink.links -%}
+                                    <li>
+                                      <a href="{{ grandchildlink.url }}" class="mega-menu__link">
+                                        <span class="wrap-text">{{- grandchildlink.title -}}</span>
+                                      </a>
+                                    </li>
+                                  {%- endfor -%}
+                                </ul>
+                              {%- endif -%}
+                            </li>
+                          {%- endfor -%}
+                        </ul>
+                      </div>
+                      <ul class="mega-menu__tiles list-unstyled">
+                        {%- for tile_index in (1..3) -%}
+                          {%- liquid
+                            # Image: tile image, then collection image, then the collection's first product image, then a placeholder.
+                            # Link: tile link, then the collection URL. A tile without either renders as a plain element.
+                            assign tile_prefix = 'tile_' | append: tile_index
+                            assign tile_image_key = tile_prefix | append: '_image'
+                            assign tile_collection_key = tile_prefix | append: '_collection'
+                            assign tile_link_key = tile_prefix | append: '_link'
+                            assign tile_label_key = tile_prefix | append: '_label'
+                            assign tile_collection = mega.settings[tile_collection_key]
+                            assign tile_image = mega.settings[tile_image_key] | default: tile_collection.image | default: tile_collection.products.first.featured_image
+                            assign tile_link = mega.settings[tile_link_key] | default: tile_collection.url
+                            assign tile_label = mega.settings[tile_label_key]
+                            assign tile_name = tile_label | default: tile_collection.title | default: link.title
+                          -%}
+                          {%- capture tile_media -%}
+                            {%- if tile_image != blank -%}
+                              {{
+                                tile_image
+                                | image_url: width: 1200
+                                | image_tag:
+                                  widths: '300, 450, 600, 900, 1200',
+                                  sizes: '(min-width: 990px) 25vw, 100vw',
+                                  loading: 'lazy',
+                                  alt: '',
+                                  class: 'mega-menu__tile-image'
+                              }}
+                            {%- else -%}
+                              <span class="mega-menu__tile-placeholder">
+                                {{- 'image' | placeholder_svg_tag: 'mega-menu__tile-placeholder-icon' -}}
+                              </span>
+                            {%- endif -%}
+                            {%- if tile_label != blank -%}
+                              <span class="mega-menu__tile-label">{{ tile_label | escape }}</span>
+                            {%- endif -%}
+                          {%- endcapture -%}
+                          <li class="mega-menu__tile">
+                            {%- if tile_link != blank -%}
+                              <a
+                                href="{{ tile_link }}"
+                                class="mega-menu__tile-link"
+                                {% if tile_label == blank %}
+                                  aria-label="{{ tile_name | escape }}"
+                                {% endif %}
+                              >
+                                {{- tile_media -}}
+                              </a>
+                            {%- else -%}
+                              <div class="mega-menu__tile-link">{{- tile_media -}}</div>
+                            {%- endif -%}
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    {% else %}
                     {% render 'mega-menu-list',
                       parent_link: link,
                       id: list_id,
@@ -162,6 +266,7 @@
                       content_aspect_ratio: ratio,
                       image_border_radius: image_border_radius
                     %}
+                    {% endif %}
                   </div>
                 </div>
               </div>
@@ -226,6 +331,11 @@
 {% style %}
   .header__underlay {
     --color-submenu: rgb({{effective_submenu_color.rgb}});
+  }
+
+  .header-menu {
+    --menu-accent-color: {{ settings.color_palette.color3 | default: 'currentColor' }};
+    --menu-letter-spacing: {% if block_settings.type_case_primary_link == 'uppercase' %}0.08em{% else %}normal{% endif %};
   }
 {% endstyle %}
 {% stylesheet %}
@@ -813,12 +923,76 @@
   .menu-list__list-item:not(:has([aria-expanded='true'])) > .menu-list__submenu product-component {
     display: none;
   }
+
+  /* Refinements: tracked top-level links, accent hairline, calmer submenu links */
+  .menu-list__link,
+  .mega-menu__link--parent {
+    letter-spacing: var(--menu-letter-spacing, normal);
+  }
+
+  .menu-list__list-item:not([slot='overflow']) .menu-list__link-title {
+    position: relative;
+  }
+
+  .menu-list__list-item:not([slot='overflow']) .menu-list__link-title::after {
+    content: '';
+    position: absolute;
+    inset-inline: var(--gap-sm);
+    inset-block-end: -0.4em;
+    height: 1px;
+    background-color: var(--menu-accent-color, currentColor);
+    transform: scaleX(0);
+    transition: transform var(--animation-speed-slow) var(--ease-out-cubic);
+  }
+
+  .menu-list__list-item:not([slot='overflow']):is(:hover, :focus-within, :has([aria-expanded='true']))
+    .menu-list__link-title::after,
+  .menu-list__link--active .menu-list__link-title::after {
+    transform: scaleX(1);
+  }
+
+  .mega-menu__link--parent {
+    padding-block-end: var(--padding-xs);
+  }
+
+  /* Long subcategory lists stay in sentence case for readability */
+  .mega-menu__link:not(.mega-menu__link--parent) {
+    text-transform: none;
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.3em;
+    text-decoration-color: transparent;
+    transition: text-decoration-color var(--animation-speed-slow) var(--animation-easing);
+
+    &:hover,
+    &:focus-visible {
+      text-decoration-color: currentColor;
+    }
+  }
+
+  /* More menu: match the top-level scale instead of oversized display text */
+  .menu-list__list-item[slot='overflow'] .menu-list__link {
+    font-size: var(--menu-top-level-font-size-desktop);
+    padding-block: var(--padding-xs);
+  }
+
+  .menu-list__list-item[slot='overflow'] .menu-list__submenu {
+    border-inline-start: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .menu-list__list-item .menu-list__link-title::after,
+    .mega-menu__link {
+      transition: none;
+    }
+  }
 {% endstylesheet %}
 
 {% schema %}
 {
   "name": "t:names.menu",
   "tag": null,
+  "blocks": [{ "type": "_mega-item" }],
   "settings": [
     {
       "type": "link_list",

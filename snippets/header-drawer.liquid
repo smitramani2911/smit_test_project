@@ -110,6 +110,17 @@
             {% assign first_accordion_open = false %}
             {% assign animation_index = 0 %}
             {%- for link in linklist.links -%}
+              {%- liquid
+                assign mega = null
+                assign link_key = link.title | downcase | strip
+                for candidate in block.blocks
+                  assign candidate_key = candidate.settings.menu_item_title | downcase | strip
+                  if candidate_key == link_key
+                    assign mega = candidate
+                    break
+                  endif
+                endfor
+              -%}
               {% assign animation_index = animation_index | plus: 1 %}
               <li
                 style="--menu-drawer-animation-index: {{ animation_index }};"
@@ -179,6 +190,26 @@
                             </a>
                           </li>
                         {%- endfor -%}
+                        {%- if mega -%}
+                          {%- for tile_index in (1..3) -%}
+                            {%- liquid
+                              assign tile_prefix = 'tile_' | append: tile_index
+                              assign tile_collection_key = tile_prefix | append: '_collection'
+                              assign tile_link_key = tile_prefix | append: '_link'
+                              assign tile_label_key = tile_prefix | append: '_label'
+                              assign tile_collection = mega.settings[tile_collection_key]
+                              assign tile_link = mega.settings[tile_link_key] | default: tile_collection.url
+                              assign tile_name = mega.settings[tile_label_key] | default: tile_collection.title
+                            -%}
+                            {%- if tile_link != blank and tile_name != blank -%}
+                              <li class="menu-drawer__list-item menu-drawer__list-item--tile">
+                                <a href="{{ tile_link }}" class="menu-drawer__menu-item menu-drawer__menu-item--child">
+                                  <span class="menu-drawer__menu-item-text wrap-text">{{ tile_name | escape }}</span>
+                                </a>
+                              </li>
+                            {%- endif -%}
+                          {%- endfor -%}
+                        {%- endif -%}
                       </ul>
                     </details>
                   {% endcapture %}
@@ -1538,5 +1569,18 @@
 
   .drawer-localization .language-selector .svg-wrapper.icon-caret svg {
     transform: none;
+  }
+
+  /* Hairline dividers and serif top-level links keep the large drawer type calm */
+  .menu-drawer__list-item--divider,
+  .menu-drawer__menu-container--divider {
+    --color-border: rgb(var(--color-foreground-rgb) / var(--opacity-15));
+  }
+
+  .menu-drawer__menu-item--mainlist {
+    font-family: var(--font-heading--family);
+    font-style: var(--font-heading--style);
+    font-weight: var(--font-heading--weight);
+    text-transform: none;
   }
 {% endstylesheet %}

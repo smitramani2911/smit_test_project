@@ -1,0 +1,201 @@
+{%- doc -%}
+  Renders one of the theme's built-in default artwork photos (stored in assets as artwork-<key>-<width>.jpg).
+  Used as the fallback when a merchant has not picked an image, so new sections never show empty boxes.
+
+  @param {string} key - Artwork key, for example 'hero' or 'skincare'
+  @param {string} [class] - Classes for the img element
+  @param {string} [style] - Inline styles for the img element
+  @param {string} [sizes] - The sizes attribute, defaults to 100vw
+  @param {string} [loading] - 'lazy' (default) or 'eager'
+  @param {string} [fetchpriority] - Fetch priority, defaults to auto
+
+  @example
+  {% render 'artwork', key: 'hero', sizes: '100vw', loading: 'eager', fetchpriority: 'high' %}
+{%- enddoc -%}
+
+{%- liquid
+  assign artwork_large = blank
+  case key
+    when 'hero'
+      assign artwork_small = 'artwork-hero-1000.jpg'
+      assign artwork_small_width = 1000
+      assign artwork_large = 'artwork-hero-2000.jpg'
+      assign artwork_width = 2000
+      assign artwork_height = 1331
+      assign artwork_alt = 'Woman with glowing skin against a soft sage backdrop'
+    when 'campaign'
+      assign artwork_small = 'artwork-campaign-1000.jpg'
+      assign artwork_small_width = 1000
+      assign artwork_large = 'artwork-campaign-2000.jpg'
+      assign artwork_width = 2000
+      assign artwork_height = 2240
+      assign artwork_alt = 'Glass dropper bottle beside soft pampas grass'
+    when 'story'
+      assign artwork_small = 'artwork-story-1000.jpg'
+      assign artwork_small_width = 1000
+      assign artwork_large = 'artwork-story-2000.jpg'
+      assign artwork_width = 2000
+      assign artwork_height = 1502
+      assign artwork_alt = 'Dried botanicals and bark in clay bowls with fresh leaves'
+    when 'gifting'
+      assign artwork_small = 'artwork-gifting-1000.jpg'
+      assign artwork_small_width = 1000
+      assign artwork_large = 'artwork-gifting-2000.jpg'
+      assign artwork_width = 2000
+      assign artwork_height = 2801
+      assign artwork_alt = 'Gift box tied with a satin ribbon on soft linen'
+    when 'ritual'
+      assign artwork_small = 'artwork-ritual-1000.jpg'
+      assign artwork_small_width = 1000
+      assign artwork_large = 'artwork-ritual-2000.jpg'
+      assign artwork_width = 2000
+      assign artwork_height = 3000
+      assign artwork_alt = 'Woman massaging her face with a gua sha stone'
+    when 'skincare'
+      assign artwork_small = 'artwork-skincare-600.jpg'
+      assign artwork_small_width = 600
+      assign artwork_large = 'artwork-skincare-1200.jpg'
+      assign artwork_width = 1200
+      assign artwork_height = 1686
+      assign artwork_alt = 'Minimal white skincare bottles and a cream jar'
+    when 'makeup'
+      assign artwork_small = 'artwork-makeup-600.jpg'
+      assign artwork_small_width = 600
+      assign artwork_large = 'artwork-makeup-1200.jpg'
+      assign artwork_width = 1200
+      assign artwork_height = 1946
+      assign artwork_alt = 'Makeup brush resting on crushed coral powder'
+    when 'haircare'
+      assign artwork_small = 'artwork-haircare-600.jpg'
+      assign artwork_small_width = 600
+      assign artwork_large = 'artwork-haircare-1200.jpg'
+      assign artwork_width = 1200
+      assign artwork_height = 1870
+      assign artwork_alt = 'Long dark hair falling across the shoulders'
+    when 'bodycare'
+      assign artwork_small = 'artwork-bodycare-600.jpg'
+      assign artwork_small_width = 600
+      assign artwork_large = 'artwork-bodycare-1200.jpg'
+      assign artwork_width = 1200
+      assign artwork_height = 1800
+      assign artwork_alt = 'Hand coated in silky body lotion'
+    when 'fragrance'
+      assign artwork_small = 'artwork-fragrance-600.jpg'
+      assign artwork_small_width = 600
+      assign artwork_large = 'artwork-fragrance-1200.jpg'
+      assign artwork_width = 1200
+      assign artwork_height = 800
+      assign artwork_alt = 'Faceted perfume bottle on blush silk'
+    when 'tools'
+      assign artwork_small = 'artwork-tools-600.jpg'
+      assign artwork_small_width = 600
+      assign artwork_large = 'artwork-tools-1200.jpg'
+      assign artwork_width = 1200
+      assign artwork_height = 800
+      assign artwork_alt = 'Amethyst face roller and gua sha stone'
+    when 'ayurvedic'
+      assign artwork_small = 'artwork-ayurvedic-600.jpg'
+      assign artwork_small_width = 600
+      assign artwork_large = 'artwork-ayurvedic-1200.jpg'
+      assign artwork_width = 1200
+      assign artwork_height = 800
+      assign artwork_alt = 'Bundles of dried herbs hanging in warm light'
+    when 'cleanse'
+      assign artwork_small = 'artwork-cleanse-600.jpg'
+      assign artwork_small_width = 600
+      assign artwork_large = 'artwork-cleanse-1200.jpg'
+      assign artwork_width = 1200
+      assign artwork_height = 1600
+      assign artwork_alt = 'Woman misting her face in front of a mirror'
+    when 'treat'
+      assign artwork_small = 'artwork-treat-600.jpg'
+      assign artwork_small_width = 600
+      assign artwork_large = 'artwork-treat-1200.jpg'
+      assign artwork_width = 1200
+      assign artwork_height = 1800
+      assign artwork_alt = 'Dropper bottle of facial oil resting on an open book'
+    when 'nourish'
+      assign artwork_small = 'artwork-nourish-600.jpg'
+      assign artwork_small_width = 600
+      assign artwork_large = 'artwork-nourish-1200.jpg'
+      assign artwork_width = 1200
+      assign artwork_height = 1800
+      assign artwork_alt = 'Hands applying cream from a pump bottle'
+    when 'dryness'
+      assign artwork_small = 'artwork-dryness-600.jpg'
+      assign artwork_small_width = 600
+      assign artwork_large = 'artwork-dryness-1200.jpg'
+      assign artwork_width = 1200
+      assign artwork_height = 1200
+      assign artwork_alt = 'Open jar of rich cream resting on a stone'
+    when 'dullness'
+      assign artwork_small = 'artwork-dullness-600.jpg'
+      assign artwork_small_width = 600
+      assign artwork_large = 'artwork-dullness-1200.jpg'
+      assign artwork_width = 1200
+      assign artwork_height = 933
+      assign artwork_alt = 'Golden oil and gel textures'
+    when 'sensitivity'
+      assign artwork_small = 'artwork-sensitivity-600.jpg'
+      assign artwork_small_width = 600
+      assign artwork_large = 'artwork-sensitivity-1200.jpg'
+      assign artwork_width = 1200
+      assign artwork_height = 800
+      assign artwork_alt = 'Fresh aloe vera leaves'
+    when 'saffron'
+      assign artwork_small = 'artwork-saffron-600.jpg'
+      assign artwork_small_width = 600
+      assign artwork_large = 'artwork-saffron-1200.jpg'
+      assign artwork_width = 1200
+      assign artwork_height = 800
+      assign artwork_alt = 'Saffron crocus flower with red stigmas'
+    when 'turmeric'
+      assign artwork_small = 'artwork-turmeric-600.jpg'
+      assign artwork_small_width = 600
+      assign artwork_large = 'artwork-turmeric-1200.jpg'
+      assign artwork_width = 1200
+      assign artwork_height = 800
+      assign artwork_alt = 'Turmeric roots and powder on a wooden spoon'
+    when 'rose'
+      assign artwork_small = 'artwork-rose-600.jpg'
+      assign artwork_small_width = 600
+      assign artwork_large = 'artwork-rose-1200.jpg'
+      assign artwork_width = 1200
+      assign artwork_height = 1805
+      assign artwork_alt = 'Soft pink and white rose petals'
+    when 'portrait'
+      assign artwork_small = 'artwork-portrait-600.jpg'
+      assign artwork_small_width = 600
+      assign artwork_large = 'artwork-portrait-1200.jpg'
+      assign artwork_width = 1200
+      assign artwork_height = 1800
+      assign artwork_alt = 'Woman with curly hair in soft natural light'
+    when 'guasha'
+      assign artwork_small = 'artwork-guasha-600.jpg'
+      assign artwork_small_width = 600
+      assign artwork_large = 'artwork-guasha-1200.jpg'
+      assign artwork_width = 1200
+      assign artwork_height = 1800
+      assign artwork_alt = 'Hands holding jade and rose quartz gua sha stones'
+  endcase
+-%}
+
+{%- if artwork_large != blank -%}
+  <img
+    src="{{ artwork_large | asset_url }}"
+    srcset="{{ artwork_small | asset_url }} {{ artwork_small_width }}w, {{ artwork_large | asset_url }} {{ artwork_width }}w"
+    sizes="{{ sizes | default: '100vw' }}"
+    width="{{ artwork_width }}"
+    height="{{ artwork_height }}"
+    alt="{{ artwork_alt | escape }}"
+    loading="{{ loading | default: 'lazy' }}"
+    fetchpriority="{{ fetchpriority | default: 'auto' }}"
+    decoding="async"
+    {% if class != blank %}
+      class="{{ class }}"
+    {% endif %}
+    {% if style != blank %}
+      style="{{ style }}"
+    {% endif %}
+  >
+{%- endif -%}

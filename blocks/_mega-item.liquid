@@ -1,0 +1,110 @@
+{% comment %}
+  Mega menu item settings, nested inside the header Menu block (blocks/_header-menu.liquid).
+  Renders no markup itself: the Menu block and snippets/header-drawer.liquid read these settings to add
+  a badge, a panel heading and three image tiles to the top-level menu item whose title matches
+  menu_item_title (not case-sensitive). Items without a matching block keep Horizon's default panel.
+{% endcomment %}
+
+{% schema %}
+{
+  "name": "Mega menu item",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "menu_item_title",
+      "label": "Menu item title",
+      "info": "Must match a top-level item in the selected menu (not case-sensitive)"
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge text",
+      "info": "Small tag shown above the item, for example NEW"
+    },
+    {
+      "type": "text",
+      "id": "panel_heading",
+      "label": "t:settings.heading",
+      "default": "Shop by Category"
+    },
+    {
+      "type": "header",
+      "content": "Tile 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "tile_1_image",
+      "label": "t:settings.image"
+    },
+    {
+      "type": "collection",
+      "id": "tile_1_collection",
+      "label": "t:settings.collection"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_link",
+      "label": "t:settings.link"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_label",
+      "label": "t:settings.label"
+    },
+    {
+      "type": "header",
+      "content": "Tile 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "tile_2_image",
+      "label": "t:settings.image"
+    },
+    {
+      "type": "collection",
+      "id": "tile_2_collection",
+      "label": "t:settings.collection"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_link",
+      "label": "t:settings.link"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_label",
+      "label": "t:settings.label"
+    },
+    {
+      "type": "header",
+      "content": "Tile 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "tile_3_image",
+      "label": "t:settings.image"
+    },
+    {
+      "type": "collection",
+      "id": "tile_3_collection",
+      "label": "t:settings.collection"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_link",
+      "label": "t:settings.link"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_label",
+      "label": "t:settings.label"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Mega menu item"
+    }
+  ]
+}
+{% endschema %}

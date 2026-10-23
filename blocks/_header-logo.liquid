@@ -21,6 +21,39 @@
   endif
 
   assign alt_text_fallback = 'accessibility.home_logo_alt' | t: store_name: shop.name
+
+  # Text wordmark settings apply only when no logo image is selected
+  assign logo_fonts = 'body,subheading,heading,accent' | split: ','
+  assign logo_font = block_settings.logo_font | default: 'body'
+  unless logo_fonts contains logo_font
+    assign logo_font = 'body'
+  endunless
+
+  if logo_font == 'body'
+    assign logo_font_weight = '600'
+  else
+    assign logo_font_weight = 'var(--font-' | append: logo_font | append: '--weight)'
+  endif
+
+  case block_settings.logo_letter_spacing
+    when 'loose'
+      assign logo_letter_spacing = '0.08em'
+    when 'wide'
+      assign logo_letter_spacing = '0.2em'
+    else
+      assign logo_letter_spacing = '0em'
+  endcase
+
+  if block_settings.logo_case == 'uppercase'
+    assign logo_text_transform = 'uppercase'
+  else
+    assign logo_text_transform = 'none'
+  endif
+
+  assign logo_text = block_settings.logo_text | default: shop.name | escape
+  capture logo_text_fallback
+    echo '<span class="header-logo__text">' | append: logo_text | append: '</span>'
+  endcapture
 %}
 
 {% comment %}
@@ -36,9 +69,12 @@
   style="
     {% render 'size-style', settings: block_settings %}
     {% render 'spacing-style', settings: block_settings %}
-    --font-family: var(--font-body--family);
-    --font-style: var(--font-body--style);
-    --font-weight: 600;
+    --font-family: var(--font-{{ logo_font }}--family);
+    --font-style: var(--font-{{ logo_font }}--style);
+    --font-weight: {{ logo_font_weight }};
+    --header-logo-text-size: {{ block_settings.logo_text_size | default: 16 }}px;
+    --header-logo-letter-spacing: {{ logo_letter_spacing }};
+    --header-logo-text-transform: {{ logo_text_transform }};
   "
   {{ block.shopify_attributes }}
 >
@@ -62,7 +98,7 @@
       class: 'header-logo__image',
       height: settings.logo_height,
       alt_text_fallback: alt_text_fallback,
-      text_fallback: shop.name,
+      text_fallback: logo_text_fallback,
       style: logo_style
     %}
   </span>
@@ -77,7 +113,7 @@
         class: 'header-logo__image',
         height: settings.logo_height,
         alt_text_fallback: alt_text_fallback,
-        text_fallback: shop.name,
+        text_fallback: logo_text_fallback,
         style: inverse_logo_style
       %}
     </span>
@@ -133,6 +169,19 @@
     }
   }
 
+  .header-logo__text {
+    font-size: var(--header-logo-text-size, var(--font-size--md));
+    letter-spacing: var(--header-logo-letter-spacing, 0em);
+    text-transform: var(--header-logo-text-transform, none);
+
+    /* Offsets the trailing letter space so the wordmark stays optically centered */
+    padding-inline-start: var(--header-logo-letter-spacing, 0em);
+
+    @media screen and (max-width: 749px) {
+      font-size: min(var(--header-logo-text-size, var(--font-size--md)), 1.375rem);
+    }
+  }
+
   .header-logo__solid-header-image-container {
     display: var(--header-logo-display, block);
   }
@@ -151,6 +200,83 @@
     {
       "type": "paragraph",
       "content": "t:content.edit_logo_in_theme_settings"
+    },
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "t:settings.text",
+      "info": "t:info.logo_font"
+    },
+    {
+      "type": "select",
+      "id": "logo_font",
+      "label": "t:settings.logo_font",
+      "info": "t:info.logo_font",
+      "options": [
+        {
+          "value": "body",
+          "label": "t:options.body"
+        },
+        {
+          "value": "subheading",
+          "label": "t:options.subheading"
+        },
+        {
+          "value": "heading",
+          "label": "t:options.heading"
+        },
+        {
+          "value": "accent",
+          "label": "t:options.accent"
+        }
+      ],
+      "default": "body"
+    },
+    {
+      "type": "range",
+      "id": "logo_text_size",
+      "label": "t:settings.size",
+      "min": 12,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "logo_letter_spacing",
+      "label": "t:settings.letter_spacing",
+      "options": [
+        {
+          "value": "normal",
+          "label": "t:options.normal"
+        },
+        {
+          "value": "loose",
+          "label": "t:options.loose"
+        },
+        {
+          "value": "wide",
+          "label": "t:options.wide"
+        }
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "select",
+      "id": "logo_case",
+      "label": "t:settings.case",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:options.default"
+        },
+        {
+          "value": "uppercase",
+          "label": "t:options.uppercase"
+        }
+      ],
+      "default": "none"
     },
     {
       "type": "header",

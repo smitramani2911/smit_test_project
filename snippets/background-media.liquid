@@ -6,6 +6,7 @@
   @param {string} [background_video_position] - The background video position
   @param {object} [background_image] - The background image
   @param {string} [background_image_position] - The background image position
+  @param {string} [background_artwork] - Built-in artwork key used when no background image is selected
   @param {string} [placeholder] - The placeholder
   @param {object} [block] - The block object
   @param {object} [section] - The section object
@@ -106,23 +107,25 @@
       assign widths = '832, 1200, 1600, 1920, 2560, 3840'
     %}
 
-    {%- if background_image != blank -%}
-      {% liquid
-        assign fetch_priority = 'auto'
-        assign loading = 'eager'
-        if section and section.index == 1
-          assign fetch_priority = 'high'
-        endif
+    {% liquid
+      assign fetch_priority = 'auto'
+      assign loading = 'eager'
+      if section and section.index == 1
+        assign fetch_priority = 'high'
+      endif
 
-        if section and section.index > 3
-          assign loading = 'lazy'
-        endif
-      %}
+      if section and section.index > 3
+        assign loading = 'lazy'
+      endif
+    %}
+    {%- if background_image != blank -%}
       {{
         background_image
         | image_url: width: 3840
         | image_tag: sizes: sizes, widths: widths, loading: loading, fetchpriority: fetch_priority
       }}
+    {%- elsif background_artwork != blank and background_artwork != 'none' -%}
+      {% render 'artwork', key: background_artwork, sizes: sizes, loading: loading, fetchpriority: fetch_priority %}
     {%- else -%}
       {%- assign placeholder_name = placeholder | default: 'hero-apparel-2' -%}
       {%- if placeholder_name == blank -%}

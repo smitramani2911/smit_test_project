@@ -1,0 +1,252 @@
+/*
+  AURVÉRA mega menu.
+  Restyles Horizon's built-in header menu (blocks/_header-menu.liquid + snippets/mega-menu-list.liquid)
+  into an editorial layout: one evenly spread row of uppercase links, and a full-width panel with the
+  child links on the left and up to three featured images on the right.
+  Loaded from sections/header.liquid. Colours, fonts and widths come from the theme's own tokens.
+*/
+
+/* ---------- Top row ---------- */
+
+@media screen and (min-width: 990px) {
+  /* When the menu is long (8+ items), let the menu column fill the bottom row so items spread across the page width. */
+  .header__row--bottom .header__columns:has(.header__column--center .overflow-menu > .menu-list__list-item:nth-child(9)) {
+    --header-template-columns: 0 minmax(0, 1fr) 0;
+
+    column-gap: 0;
+  }
+
+  .header__row--bottom .header__column--center:has(.overflow-menu > .menu-list__list-item:nth-child(9)) :is(header-menu, .header-menu__inner, .menu-list, overflow-list) {
+    width: 100%;
+  }
+
+  .header__row--bottom .overflow-menu:has(> .menu-list__list-item:nth-child(9))::part(list) {
+    justify-content: space-between;
+  }
+
+  /* Fluid type so twelve labels stay on one line from 1024px up. */
+  .header-menu .menu-list .menu-list__link {
+    font-size: clamp(0.6875rem, 0.25rem + 0.68vw, 0.8125rem);
+    letter-spacing: clamp(0.5px, 0.18vw - 1.2px, 1.6px);
+  }
+
+  .header-menu .menu-list .menu-list__link-title {
+    padding-inline: clamp(0.25rem, 1vw - 0.4rem, 1rem);
+  }
+
+  /* Active and hovered items read as bold; a stroke avoids the width jump a font-weight change would cause. */
+  .header-menu .menu-list__list-item:is(:hover, :focus-within) .menu-list__link-title,
+  .header-menu .menu-list__list-item:has([aria-expanded='true']) .menu-list__link-title,
+  .header-menu .menu-list__link--active .menu-list__link-title {
+    -webkit-text-stroke: 0.35px currentcolor;
+  }
+
+  /* The bold state replaces the earlier hairline underline. */
+  .header-menu .menu-list__list-item:not([slot='overflow']) .menu-list__link-title::after {
+    content: none;
+  }
+
+  .header-menu .menu-list__link:focus-visible {
+    outline: var(--focus-outline-width) solid currentcolor;
+    outline-offset: calc(-1 * var(--focus-outline-width));
+  }
+}
+
+/* ---------- Panel ---------- */
+
+@media screen and (min-width: 990px) {
+  .header-menu .menu-list__submenu-inner {
+    border-block-start: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+  }
+
+  /* Child links in a ~25% left column, featured images across the remaining width. */
+  .header-menu .mega-menu__grid:has(> .mega-menu__content) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+    column-gap: var(--gap-3xl, 3rem);
+  }
+
+  .header-menu .mega-menu__grid:has(> .mega-menu__content) > .mega-menu__list {
+    grid-column: 1;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+  }
+
+  .header-menu .mega-menu__grid:has(> .mega-menu__content) > .mega-menu__content {
+    grid-column: 2;
+  }
+
+  /* Without featured content the links simply use the full width. */
+  .header-menu .mega-menu__grid:not(:has(> .mega-menu__content)) > .mega-menu__list {
+    align-content: start;
+  }
+
+  .header-menu .mega-menu__column > div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .header-menu .mega-menu__link {
+    padding-block: var(--padding-xs, 0.5rem);
+  }
+
+  .header-menu .mega-menu__link--parent {
+    padding-block-end: var(--padding-sm, 0.75rem);
+    margin-block-end: var(--padding-xs, 0.5rem);
+    border-block-end: var(--style-border-width, 1px) solid var(--color-border);
+  }
+
+  .header-menu .mega-menu__link:hover .wrap-text {
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+    text-decoration-thickness: 1px;
+  }
+
+  /* Three equal image tiles with a small gap. */
+  .header-menu .mega-menu__content-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    justify-content: stretch;
+    gap: var(--gap-sm, 0.75rem);
+  }
+}
+
+/* ---------- Mega menu items (blocks/_mega-item.liquid) ---------- */
+
+@media screen and (min-width: 990px) {
+  /* Room above the labels for badges, applied to every item so the row stays aligned. */
+  .header-menu .menu-list:has(.menu-list__badge) .menu-list__link {
+    padding-block-start: 1.375em;
+  }
+
+  .header-menu .menu-list__link-title {
+    position: relative;
+  }
+
+  /* Small dark tag with a downward caret, centred above the item. */
+  .menu-list__badge {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 0.5em);
+    transform: translateX(-50%);
+    padding: 0.2em 0.55em;
+    border-radius: 2px;
+    background-color: var(--color-foreground);
+    color: var(--color-background);
+    font-size: 0.7em;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    -webkit-text-stroke: 0;
+    pointer-events: none;
+  }
+
+  .menu-list__badge::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-block-end: 0;
+    border-block-start-color: var(--color-foreground);
+  }
+
+  /* Panel: ~25% link column with a heading, three equal tiles across the rest. */
+  .header-menu .mega-menu__grid--tiles {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+    column-gap: var(--gap-3xl, 3rem);
+    align-items: start;
+  }
+
+  .mega-menu__heading {
+    margin: 0 0 var(--padding-xs, 0.5rem);
+    padding-block-end: var(--padding-sm, 0.75rem);
+    border-block-end: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-15));
+    font-family: var(--menu-parent-font-family, var(--font-body--family));
+    font-size: var(--menu-parent-font-size, 1rem);
+    font-weight: 600;
+    color: var(--menu-parent-font-color, var(--color-foreground));
+  }
+
+  .mega-menu__aside-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mega-menu__tiles {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gap-sm, 0.75rem);
+    margin: 0;
+  }
+
+  .mega-menu__tile-link {
+    position: relative;
+    display: block;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-5));
+    color: var(--color-background);
+    text-decoration: none;
+  }
+
+  .mega-menu__tile-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--animation-speed-slow, 0.4s) var(--ease-out-cubic, ease-out);
+  }
+
+  a.mega-menu__tile-link:hover .mega-menu__tile-image {
+    transform: scale(1.03);
+  }
+
+  .mega-menu__tile-placeholder {
+    display: grid;
+    place-items: center;
+    height: 100%;
+  }
+
+  .mega-menu__tile-placeholder-icon {
+    width: 30%;
+    height: auto;
+    opacity: var(--opacity-40);
+    color: var(--color-foreground);
+  }
+
+  /* Optional label, bottom-centred on a dark gradient. */
+  .mega-menu__tile-label {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    padding: 2.5rem 1rem 0.875rem;
+    background: linear-gradient(to top, rgb(var(--color-foreground-rgb) / var(--opacity-70)), transparent);
+    color: var(--color-background);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  a.mega-menu__tile-link:focus-visible {
+    outline: var(--focus-outline-width) solid var(--color-foreground);
+    outline-offset: var(--focus-outline-offset);
+  }
+}
+
+/* ---------- Drawer (< 990px) ---------- */
+
+@media screen and (max-width: 989px) {
+  .menu-drawer {
+    overflow-x: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header-menu .menu-list__submenu-inner,
+  .mega-menu__tile-image {
+    transition: none;
+  }
+}

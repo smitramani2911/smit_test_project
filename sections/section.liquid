@@ -291,6 +291,112 @@
     },
     {
       "type": "select",
+      "id": "background_artwork",
+      "label": "Default artwork",
+      "info": "Built-in photo shown until you select an image",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:options.none"
+        },
+        {
+          "value": "hero",
+          "label": "Radiant portrait (sage)"
+        },
+        {
+          "value": "campaign",
+          "label": "Dropper and pampas"
+        },
+        {
+          "value": "story",
+          "label": "Botanicals in clay bowls"
+        },
+        {
+          "value": "gifting",
+          "label": "Ribbon-tied gift"
+        },
+        {
+          "value": "ritual",
+          "label": "Gua sha ritual"
+        },
+        {
+          "value": "skincare",
+          "label": "Skincare still life"
+        },
+        {
+          "value": "makeup",
+          "label": "Makeup brush"
+        },
+        {
+          "value": "haircare",
+          "label": "Hair"
+        },
+        {
+          "value": "bodycare",
+          "label": "Body lotion"
+        },
+        {
+          "value": "fragrance",
+          "label": "Fragrance bottle"
+        },
+        {
+          "value": "tools",
+          "label": "Face roller"
+        },
+        {
+          "value": "ayurvedic",
+          "label": "Hanging herbs"
+        },
+        {
+          "value": "cleanse",
+          "label": "Face mist"
+        },
+        {
+          "value": "treat",
+          "label": "Facial oil"
+        },
+        {
+          "value": "nourish",
+          "label": "Hand cream"
+        },
+        {
+          "value": "dryness",
+          "label": "Cream jar"
+        },
+        {
+          "value": "dullness",
+          "label": "Golden textures"
+        },
+        {
+          "value": "sensitivity",
+          "label": "Aloe vera"
+        },
+        {
+          "value": "saffron",
+          "label": "Saffron flower"
+        },
+        {
+          "value": "turmeric",
+          "label": "Turmeric"
+        },
+        {
+          "value": "rose",
+          "label": "Rose petals"
+        },
+        {
+          "value": "portrait",
+          "label": "Natural light portrait"
+        },
+        {
+          "value": "guasha",
+          "label": "Gua sha stones"
+        }
+      ],
+      "default": "none",
+      "visible_if": "{{ section.settings.background_media == 'image' and section.settings.background_image == blank }}"
+    },
+    {
+      "type": "select",
       "id": "background_image_position",
       "label": "t:settings.image_position",
       "options": [
